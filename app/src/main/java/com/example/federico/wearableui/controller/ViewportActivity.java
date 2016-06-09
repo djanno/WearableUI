@@ -194,6 +194,8 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
 
         this.monitor.drawText(new Point(calibratingLog.getViewportCoordinates().x, calibratingLog.getViewportCoordinates().y - 25),
                 "move your head around...", 15, Color.WHITE, 255, true);
+
+        this.monitor.invalidate();
     }
 
     @Override
@@ -203,6 +205,8 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
 
         this.monitor.drawText(new Point(-this.monitor.getViewportWidth() / 2 + 25, doneLog.getViewportCoordinates().y - 25),
                 "fix at a point...", 15, Color.WHITE, 255, true);
+
+        this.monitor.invalidate();
     }
 
     @Override
@@ -212,6 +216,8 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
 
         this.monitor.drawText(new Point(-this.monitor.getViewportWidth() / 2 + 200, this.monitor.getViewportHeight() / 2 - 25),
                 "  done", 15, Color.GREEN, 255, true);
+
+        this.monitor.invalidate();
 
         this.gaze.calibrate(calibration);
 
