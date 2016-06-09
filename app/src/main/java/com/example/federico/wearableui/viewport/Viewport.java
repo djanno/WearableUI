@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 
 import com.example.federico.wearableui.controller.ViewportActivity;
 import com.example.federico.wearableui.viewport.drawable_content.DrawableBitmap;
+import com.example.federico.wearableui.viewport.drawable_content.DrawableCircle;
 import com.example.federico.wearableui.viewport.drawable_content.DrawableContent;
 import com.example.federico.wearableui.viewport.drawable_content.DrawableLine;
 import com.example.federico.wearableui.viewport.drawable_content.DrawablePoint;
@@ -209,6 +210,15 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
     }
 
     @Override
+    public DrawableCircle drawCircle(final Point where, final int radius, final int color, final int alpha,
+                                     final boolean fill) {
+        final Paint paint = this.preparePaint(color, alpha, fill);
+        final DrawableCircle toDraw = new DrawableCircle(where, this, paint, radius);
+        this.addContent(toDraw);
+        return toDraw;
+    }
+
+    @Override
     public DrawableLine drawLine(final Point from, final Point to, final int color, final int alpha,
                                  final boolean fill) {
         final Paint paint = this.preparePaint(color, alpha, fill);
@@ -238,13 +248,11 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
     @Override
     public void addContent(final DrawableContent toAdd) {
         this.children.add(toAdd);
-        this.invalidate();
     }
 
     @Override
     public boolean removeContent(final DrawableContent toRemove) {
         if(this.children.remove(toRemove)) {
-            this.invalidate();
             return true;
         }
         return false;

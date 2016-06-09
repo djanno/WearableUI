@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.example.federico.wearableui.representation.EulerAngles;
 import com.example.federico.wearableui.viewport.drawable_content.DrawableBitmap;
+import com.example.federico.wearableui.viewport.drawable_content.DrawableCircle;
 import com.example.federico.wearableui.viewport.drawable_content.DrawableContent;
 import com.example.federico.wearableui.viewport.drawable_content.DrawableLine;
 import com.example.federico.wearableui.viewport.drawable_content.DrawablePoint;
@@ -49,6 +50,10 @@ public interface IViewport {
     /* draws a rectangle on the viewport with the given parameters */
     DrawableRectangle drawRectangle(final Point where, final int width, final int height, final int color,
                                     final int alpha, final boolean fill);
+
+    /* draws a circle on the viewport with the given parameters */
+    DrawableCircle drawCircle(final Point where, final int radius, final int color, final int alpha,
+                              final boolean fill);
 
     /* draws a line on the viewport with the given parameters */
     DrawableLine drawLine(final Point from, final Point to, final int color, final int alpha,
