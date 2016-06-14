@@ -47,6 +47,9 @@ public class IntraProcessMessageHandler extends Handler {
         else if(this.compare(msg, IntraProcessMessage.REDRAW_CURSOR)) {
             this.callbackInterface.redrawCursor();
         }
+        else if(this.compare(msg, IntraProcessMessage.RESET_CURSOR_POSITION)) {
+            this.callbackInterface.resetCursorPosition();
+        }
         else if(this.compare(msg, IntraProcessMessage.GAZE_ORIENTATION_UPDATE)) {
             final Parcelable gOrientationUpdate = this.retrieveParcelable(msg, IntraProcessMessage.GAZE_ORIENTATION_UPDATE);
             this.callbackInterface.onGazeOrientationUpdate((Quaternion) gOrientationUpdate);
