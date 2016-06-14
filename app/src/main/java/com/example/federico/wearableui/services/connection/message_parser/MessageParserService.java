@@ -142,11 +142,11 @@ public class MessageParserService extends Service {
                 Log.i("MessageParserTask", "Waiting for a device to connect.");
                 final BluetoothSocket socket = this.welcomeSocket.accept();
                 Log.i("MessageParserTask", "Connected to: " + socket.getRemoteDevice().getName() + ", " + socket.getRemoteDevice().getAddress());
-                MessageParserService.this.connectionHandler.post(new ParseMessageTask(socket));
+                MessageParserService.this.enqueueTask(new ParseMessageTask(socket), 0);
             }
             catch(final IOException e) {
                 //if something went wrong, try again to accept connections
-                MessageParserService.this.connectionHandler.post(new AcceptConnectionTask());
+                MessageParserService.this.enqueueTask(new AcceptConnectionTask(), 0);
             }
             finally {
                 try {

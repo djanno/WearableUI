@@ -107,6 +107,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
     protected void onResume() {
         super.onResume();
         this.isInForeground = true;
+        IntraProcessMessageHandler.getInstance().removeCallbacksAndMessages(null);
         final Intent bindSensorService = new Intent(this, SensorFusionService.class);
         this.bindService(bindSensorService, this.mServiceConnection, BIND_AUTO_CREATE);
     }
