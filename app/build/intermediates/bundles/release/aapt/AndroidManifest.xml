@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
-        <service android:name="com.example.federico.wearableui.services.imu_sensors_handling.ImuSensorFusionService" />
+        <service android:name="com.example.federico.wearableui.services.imu_handling.SensorFusionService" />
         <service android:name="com.example.federico.wearableui.services.connection.message_parser.MessageParserService" />
     </application>
 

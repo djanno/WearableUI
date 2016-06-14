@@ -19,17 +19,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.example.federico.wearableui.R;
 import com.example.federico.wearableui.intraprocess_messaging.IPMHCallbackInterface;
 import com.example.federico.wearableui.intraprocess_messaging.IntraProcessMessageHandler;
 import com.example.federico.wearableui.representation.Quaternion;
-import com.example.federico.wearableui.services.imu_sensors_handling.ImuSensorFusionService;
-import com.example.federico.wearableui.services.imu_sensors_handling.ImuSensorHandlerService;
+import com.example.federico.wearableui.services.imu_handling.ImuHandlerService;
+import com.example.federico.wearableui.services.imu_handling.SensorFusionService;
 import com.example.federico.wearableui.viewport.IViewport;
 import com.example.federico.wearableui.viewport.Viewport;
 import com.example.federico.wearableui.viewport.drawable_content.DrawableContent;
-import com.example.federico.wearableui.viewport.drawable_content.DrawableText;
-import com.example.federico.wearableui.viewport.drawable_content.interaction_listener.EventListener;
 import com.example.federico.wearableui.model.finger.Finger;
 import com.example.federico.wearableui.services.connection.message_parser.MessageParserService;
 import com.example.federico.wearableui.model.finger.IFinger;
@@ -45,7 +42,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName name, final IBinder service) {
-            mBinder = (ImuSensorHandlerService.Binder) service;
+            mBinder = (ImuHandlerService.Binder) service;
         }
 
         @Override
@@ -54,7 +51,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
         }
     };
 
-    private ImuSensorHandlerService.Binder mBinder;
+    private ImuHandlerService.Binder mBinder;
 
     private Viewport viewport;
 
@@ -82,7 +79,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(this.getSupportActionBar() != null) {
+        if(this.getSupportActionBar() != null && this.getSupportActionBar().isShowing()) {
             this.getSupportActionBar().hide();
         }
 
@@ -110,7 +107,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
     protected void onResume() {
         super.onResume();
         this.isInForeground = true;
-        final Intent bindSensorService = new Intent(this, ImuSensorFusionService.class);
+        final Intent bindSensorService = new Intent(this, SensorFusionService.class);
         this.bindService(bindSensorService, this.mServiceConnection, BIND_AUTO_CREATE);
     }
 
