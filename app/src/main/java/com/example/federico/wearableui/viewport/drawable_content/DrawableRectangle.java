@@ -7,13 +7,32 @@ import android.graphics.Point;
 import com.example.federico.wearableui.viewport.Viewport;
 
 /**
- * Created by Federico on 15/04/2016.
+ * @author Federico Giannoni
+ */
+
+/**
+ * This class models a DrawableRectangle.
  */
 public class DrawableRectangle extends DrawableContent implements IDrawableRectangle {
 
+    /**
+     * The rectangle width in pixels.
+     */
     private int width;
+    /**
+     * The rectangle height in pixels.
+     */
     private int height;
 
+    /**
+     * Constructor.
+     * @param viewportCoordinates the {@link Point} representing the coordinate of the {@link Viewport} in
+     *                            which the bottom left point of the DrawableRectangle will be placed.
+     * @param viewport the Viewport that will contain the DrawableRectangle.
+     * @param paint the {@link Paint} that the DrawableRectangle will use to draw itself.
+     * @param width an int representing the length in pixels of the DrawableRectangle.
+     * @param height an int representing the height in pixels of the DrawableRectangle.
+     */
     public DrawableRectangle(final Point viewportCoordinates, final Viewport viewport, final Paint paint,
                              final int width, final int height) {
         super(viewportCoordinates, viewport, paint);

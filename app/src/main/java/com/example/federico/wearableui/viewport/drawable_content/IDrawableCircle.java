@@ -1,10 +1,18 @@
 package com.example.federico.wearableui.viewport.drawable_content;
 
 /**
- * Created by Federico on 09/06/2016.
+ * @author Federico Giannoni
+ */
+
+/**
+ * Interface that defines the behaviour of a {@link DrawableCircle}.
  */
 public interface IDrawableCircle extends IDrawableContent {
 
+    /**
+     * Sets the radius of the DrawableCircle.
+     * @param radius the length of the radius expressed in pixels.
+     */
     void setRadius(final int radius);
 
 }

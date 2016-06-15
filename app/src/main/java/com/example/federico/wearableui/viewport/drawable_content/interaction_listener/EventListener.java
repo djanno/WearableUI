@@ -4,10 +4,19 @@ package com.example.federico.wearableui.viewport.drawable_content.interaction_li
 import com.example.federico.wearableui.viewport.drawable_content.DrawableContent;
 
 /**
- * Created by Federico on 15/04/2016.
+ * {@author Federico Giannoni}
+ */
+
+/**
+ * Interface that defines the behaviour of a generic EventListener for a {@link DrawableContent}.
  */
 public interface EventListener {
 
+    /**
+     * Callback called each time an event involving the {@link DrawableContent} to which this listener
+     * is associated is fired.
+     * @param content the DrawableContent involved in the event fired.
+     */
     void onEventFired(final DrawableContent content);
 
 }

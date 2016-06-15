@@ -18,7 +18,7 @@ document.getElementById(id+'Link').style.display = 'none';
 <body>
 <h1>Lint Report</h1>
 <div class="titleSeparator"></div>
-Check performed at Thu Jun 09 12:02:19 CEST 2016.<br/>
+Check performed at Wed Jun 15 13:10:01 CEST 2016.<br/>
 0 errors and 5 warnings found:<br/><br/>
 <table class="overview">
 <tr><td></td><td class="categoryColumn"><a href="#Correctness">Correctness</a>
@@ -153,13 +153,13 @@ Adds deep links to get your app into the Google index, to get installs and traff
 <div class="id"><a href="#" title="Return to top">ClickableViewAccessibility: Accessibility in Custom Views</a><div class="issueSeparator"></div>
 </div>
 <div class="warningslist">
-<span class="location"><a href="../../src/main/java/com/example/federico/wearableui/viewport/Viewport.java">../../src/main/java/com/example/federico/wearableui/viewport/Viewport.java</a>:254</span>: <span class="message"><code>com/example/federico/wearableui/viewport/Viewport#onTouch</code> should call <code>View#performClick</code> when a click is detected</span><br /><pre class="errorlines">
-<span class="lineno"> 251</span>     }
-<span class="lineno"> 252</span> 
-<span class="lineno"> 253</span>     @Override
-<span class="lineno"> 254</span>     public boolean <span class="errorspan">onTouch(final View v, final MotionEvent event) {</span>
-<span class="lineno"> 255</span> 
-<span class="lineno"> 256</span>         if(event.getAction() == MotionEvent.ACTION_DOWN) {
+<span class="location"><a href="../../src/main/java/com/example/federico/wearableui/viewport/Viewport.java">../../src/main/java/com/example/federico/wearableui/viewport/Viewport.java</a>:325</span>: <span class="message"><code>com/example/federico/wearableui/viewport/Viewport#onTouch</code> should call <code>View#performClick</code> when a click is detected</span><br /><pre class="errorlines">
+<span class="lineno"> 322</span>     }
+<span class="lineno"> 323</span> 
+<span class="lineno"> 324</span>     @Override
+<span class="lineno"> 325</span>     public boolean <span class="errorspan">onTouch(final View v, final MotionEvent event) {</span>
+<span class="lineno"> 326</span> 
+<span class="lineno"> 327</span>         if(event.getAction() == MotionEvent.ACTION_DOWN) {
 </pre>
 </div>
 <div class="metadata">Priority: 6 / 10<br/>

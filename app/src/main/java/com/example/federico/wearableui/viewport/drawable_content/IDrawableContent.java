@@ -9,58 +9,100 @@ import com.example.federico.wearableui.viewport.drawable_content.interaction_lis
 
 
 /**
- * Created by Federico on 14/04/2016.
+ * @author Federico Giannoni
  */
 
 /**
- * Interface for {@link DrawableContent}
+ * Interface that defines the behaviour of a {@link DrawableContent}
  */
 public interface IDrawableContent {
 
-    /* draws the drawable content onto the given canvas */
+    /**
+     * Draws the DrawableContent onto the given canvas.
+     * @param canvas the Canvas onto which the DrawableContent will drawn itself.
+     */
     void drawOnCanvas(final Canvas canvas);
 
-    /* draws the drawable content onto the given canvas, as if such canvas was a continuous canvas */
+    /**
+     * Draws the drawable content onto the given canvas, as if such canvas was a continuous canvas.
+     * @param canvas the Canvas onto which the DrawableContent will drawn itself.
+     */
     void drawOnContinuousCanvas(final Canvas canvas);
 
-    /* checks if the point is contained in the bounds of the drawable content.
-    *  Be aware that the point has to be relative to the viewport coordinates and not to the android
-    *  coordinates */
+    /**
+     * Checks if the {@link Point} is contained in the bounds of this DrawableContent. Be aware that hte point has to be
+     * expressed in the {@link Viewport} coordinate system and not in the Android coordinate system.
+     * @param point the point to check.
+     * @return true if the Point is inside the bounds of this DrawableContent, false otherwise.
+     */
     boolean isInBounds(final Point point);
 
-    /* moves the drawable content over to the specified point.
-    *  Be aware that the point has to be relative to the viewport coordinates and not to the android
-    *  coordinates */
+    /**
+     * Moves this DrawableContent over to the specified {@link Point}. Be aware that the point has to be
+     * relative to the {@link Viewport} coordinate system.
+     * @param point the Point where the DrawableContent has to be moved.
+     */
     void moveTo(final Point point);
 
-    /* informs the drawable content that an event that involves it has been registered */
+    /**
+     * Programmatically fires an event involving the DrawableContent that calls it. If a {@link EventListener} is
+     * set for this DrawableContent, it will be notified.
+     * @return true if the event has been handled by a EventListener, false otherwise.
+     */
     boolean fireEvent();
 
-    /* returns the paint the component uses to draw itself */
+    /**
+     * Returns the {@link Paint} used by this DrawableContent to draw itself.
+     * @return the Paint used by this DrawableContent to draw itself.
+     */
     Paint getPaint();
 
-    /* returns the coordinates of the component inside the viewport (these are viewport based too) */
+    /**
+     * Returns the coordinates of this DrawableContent expressed in the {@link Viewport} coordinate system.
+     * @return a {@link Point} representing the coordinates of this DrawableContent expressed in the {@link Viewport} coordinate system.
+     */
     Point getViewportCoordinates();
 
-    /* returns the viewport that contains this component */
+    /**
+     * Returns the {@link Viewport} that contains this DrawableContent.
+     * @return the Viewport that contains this DrawableContent.
+     */
     Viewport getContainer();
 
-    /* returns the visibility of this component */
+    /**
+     * Returns the {@link com.example.federico.wearableui.viewport.drawable_content.DrawableContent.Visibility} of this DrawableContent.
+     * @return the Visibility of this DrawableContent.
+     */
     DrawableContent.Visibility getVisibility();
 
-    /* sets the event listener for the drawable content */
+    /**
+     * Sets the passed {@link EventListener} for this DrawableContent.
+     * @param listener an EventListener for this DrawableContent.
+     */
     void setEventListener(final EventListener listener);
 
-    /* sets the color used to draw this component */
+    /**
+     * Sets the color used by this DrawableContent to draw itself.
+     * @param color an int representing a color.
+     */
     void setColor(final int color);
 
-    /* set the alpha used to draw this component */
+    /**
+     * Sets the alpha used by this DrawableContent to draw itself.
+     * @param alpha an int expressing the alpha (from 0 to 255).
+     */
     void setAlpha(final int alpha);
 
-    /* sets the fill property used to draw this component. True to fill, false otherwise */
+    /**
+     * Sets the fill property of the {@link Paint} used by this DrawableContent to draw itself.
+     * @param fill true for a filling Paint, false for a stroke style Paint.
+     */
     void setFill(final boolean fill);
 
-    /* sets the visibility of the drawable content */
+    /**
+     * Sets the {@link com.example.federico.wearableui.viewport.drawable_content.DrawableContent.Visibility} of this DrawableContent.
+     * @param visibility the Visibility of this DrawableContent.
+     */
     void setVisibility(final DrawableContent.Visibility visibility);
 
 }

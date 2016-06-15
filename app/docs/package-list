@@ -1,0 +1,15 @@
+com.example.federico.wearableui
+com.example.federico.wearableui.controller
+com.example.federico.wearableui.intraprocess_messaging
+com.example.federico.wearableui.model.finger
+com.example.federico.wearableui.model.gaze
+com.example.federico.wearableui.representation
+com.example.federico.wearableui.services.connection.connection_template
+com.example.federico.wearableui.services.connection.message_parser
+com.example.federico.wearableui.services.connection.messages
+com.example.federico.wearableui.services.connection.messages.content
+com.example.federico.wearableui.services.imu_handling
+com.example.federico.wearableui.viewport
+com.example.federico.wearableui.viewport.drawable_content
+com.example.federico.wearableui.viewport.drawable_content.cursor
+com.example.federico.wearableui.viewport.drawable_content.interaction_listener
