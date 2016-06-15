@@ -33,12 +33,30 @@ import com.example.federico.wearableui.model.finger.IFinger;
 import com.example.federico.wearableui.model.gaze.Gaze;
 import com.example.federico.wearableui.model.gaze.IGaze;
 
+/**
+ * This class defines the Activity that serves as the main controller for the system. All of its calls
+ * are executed on the Main Thread. This Activity implements {@link IPMHCallbackInterface} making it the delegate
+ * for all the callbacks used to handle the {@link com.example.federico.wearableui.intraprocess_messaging.IntraProcessMessage}s
+ * received by the {@link IntraProcessMessageHandler}.
+ */
 public abstract class ViewportActivity extends IPMHCallbackInterface implements IViewportActivity {
 
+    /**
+     * ID for Intent request.
+     */
     private static final int BECOME_DISCOVERABLE_REQUEST_ID = 0;
+    /**
+     * ID for Intent request.
+     */
     private static final int BLUETOOTH_ENABLE_REQUEST_ID = 1;
+    /**
+     * ID for Intent request.
+     */
     private static final int REQUEST_COARSE_PERMISSION = 2;
 
+    /**
+     * Service Connection for the Service that handles the Imu of the device.
+     */
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName name, final IBinder service) {
@@ -51,18 +69,39 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
         }
     };
 
+    /**
+     * Sensor Service binder.
+     */
     private ImuHandlerService.Binder mBinder;
 
+    /**
+     * The Viewport of the Activity. This is also the ContentView of the Activity.
+     */
     private Viewport viewport;
 
+    /**
+     * A secondary Viewport that is set and used to display logs, such as calibration status update logs.
+     */
     private Viewport monitor;
 
+    /**
+     * The Finger.
+     */
     private IFinger finger;
 
+    /**
+     * The Gaze.
+     */
     private IGaze gaze;
 
+    /**
+     * A flag indicating whether or not the Activity is in foreground.
+     */
     private boolean isInForeground;
 
+    /**
+     * Asks for permissions.
+     */
     private void checkForPermissions() {
         int hasPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
         if (hasPermission != PackageManager.PERMISSION_GRANTED) {
@@ -70,6 +109,9 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
         }
     }
 
+    /**
+     * Makes the device visible to all other bluetooth devices for an unlimited amount of time.
+     */
     private void makeDeviceVisible() {
         final Intent becomeDiscoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         becomeDiscoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
@@ -79,7 +121,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(this.getSupportActionBar() != null && this.getSupportActionBar().isShowing()) {
+        if (this.getSupportActionBar() != null && this.getSupportActionBar().isShowing()) {
             this.getSupportActionBar().hide();
         }
 
@@ -115,10 +157,9 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == BLUETOOTH_ENABLE_REQUEST_ID && resultCode == Activity.RESULT_OK) {
+        if (requestCode == BLUETOOTH_ENABLE_REQUEST_ID && resultCode == Activity.RESULT_OK) {
             this.makeDeviceVisible();
-        }
-        else if(requestCode == BECOME_DISCOVERABLE_REQUEST_ID && resultCode == Activity.RESULT_FIRST_USER) {
+        } else if (requestCode == BECOME_DISCOVERABLE_REQUEST_ID && resultCode == Activity.RESULT_FIRST_USER) {
             //start connection service to allow the finger orientation source to connect to you
             final Intent startMessageParserService = new Intent(this, MessageParserService.class);
             this.startService(startMessageParserService);
@@ -128,7 +169,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
     @Override
     public void onRequestPermissionsResult(final int requestCode, @NonNull String permissions[], @NonNull final int[] grantResults) {
         if (requestCode == REQUEST_COARSE_PERMISSION && grantResults.length == 2 && (grantResults[0] != PackageManager.PERMISSION_GRANTED
-                || grantResults[1] != PackageManager.PERMISSION_GRANTED )) {
+                || grantResults[1] != PackageManager.PERMISSION_GRANTED)) {
             Toast.makeText(this, "You can't proceed without giving permissions", Toast.LENGTH_SHORT).show();
             this.finish();
         }
@@ -142,20 +183,20 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
 
     @Override
     public void setContentView(final View view) {
-        if(!(view instanceof Viewport)) {
+        if (!(view instanceof Viewport)) {
             throw new IllegalArgumentException("A ViewportActivity can only have a Viewport set as its" +
                     "content view.");
         }
-        //setting fullscreen mode
+        // Setting fullscreen mode
         final Window window = this.getWindow();
         final WindowManager.LayoutParams windowParams = window.getAttributes();
         windowParams.flags |= 0x80000000;
         window.setAttributes(windowParams);
-        //setting the viewport and linking it to the gaze
+        // Setting the viewport and linking it to the gaze
         this.viewport = (Viewport) view;
-        //if the calibration phase is over, we can set the current viewport instantly to be displayed
-        //otherwise it will be done when the calibration phase is over
-        if(this.mBinder != null && this.mBinder.askHasCalibrationPhaseFinished()) {
+        // If the calibration phase is over, we can set the current viewport instantly to be displayed
+        // otherwise it will be done when the calibration phase is over
+        if (this.mBinder != null && this.mBinder.askHasCalibrationPhaseFinished()) {
             super.setContentView(this.viewport);
         }
     }
@@ -168,7 +209,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
 
     @Override
     protected void redrawViewport() {
-        //the viewport is redrawn based on where the wearer's gaze is oriented
+        // The viewport is redrawn based on where the wearer's gaze is oriented
         this.viewport.scrollAccordingly(this.gaze.getGazePitch(), this.gaze.getGazeYaw());
     }
 
@@ -179,7 +220,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
 
     @Override
     protected void redrawCursor() {
-        //the cursor is redrawn based on where the wearer's finger is oriented
+        // The cursor is redrawn based on where the wearer's finger is oriented
         this.viewport.getCursor().moveAccordingly(this.finger.getFingerPitch(), this.finger.getFingerYaw());
     }
 
@@ -219,7 +260,7 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
 
         this.gaze.calibrate(calibration);
 
-        if(this.viewport != null) {
+        if (this.viewport != null) {
             super.setContentView(this.viewport);
             this.monitor = null;
         }
@@ -247,10 +288,9 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
 
     @Override
     protected void onLockUnlockCommandReceived() {
-        if(this.viewport.isLocked()) {
+        if (this.viewport.isLocked()) {
             this.viewport.unlock();
-        }
-        else {
+        } else {
             this.viewport.lock();
         }
     }
@@ -268,21 +308,19 @@ public abstract class ViewportActivity extends IPMHCallbackInterface implements 
     @Override
     public void openBluetoothConnection() {
         final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if(adapter == null) {
+        if (adapter == null) {
             Toast.makeText(this.getApplicationContext(), "No bluetooth adapter was found on the device.", Toast.LENGTH_SHORT).show();
             this.finish();
-        }
-        else if(!adapter.isEnabled()) {
+        } else if (!adapter.isEnabled()) {
             this.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), BLUETOOTH_ENABLE_REQUEST_ID);
-        }
-        else {
+        } else {
             this.makeDeviceVisible();
         }
     }
 
     @Override
     public void closeBluetoothConnection() {
-        //close service
+        // Close connection and parsing Service
         final Intent stopMessageParserService = new Intent(this, MessageParserService.class);
         this.stopService(stopMessageParserService);
     }

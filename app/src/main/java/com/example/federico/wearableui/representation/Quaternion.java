@@ -27,6 +27,9 @@ import android.os.Parcelable;
  */
 public class Quaternion extends Vector4f implements Parcelable {
 
+    /**
+     * Creator for the {@link Parcelable} interface.
+     */
     public static final Creator<Quaternion> CREATOR = new Creator<Quaternion>() {
         @Override
         public Quaternion createFromParcel(final Parcel in) {
@@ -559,18 +562,33 @@ public class Quaternion extends Vector4f implements Parcelable {
         }
     }
 
+    /**
+     * Returns the pitch angle relative to position represented by this Quaternion.
+     * @return the pitch angle in radians.
+     */
     public float getPitch() {
         return (float) Math.asin(2.0f * (this.w() * this.y() - this.z() * this.x()));
     }
 
+    /**
+     * Returns the yaw angle relative to the position represented by this Quaternion.
+     * @return the yaw angle in radians.
+     */
     public float getYaw() {
         return (float) Math.atan2(2.0f * (this.w() * this.z() + this.x() * this.y()), 1.0f - 2.0f * (this.y() * this.y() + this.z() * this.z()));
     }
 
+    /**
+     * Returns the roll angle relative to the position represented by this Quaternion.
+     * @return the roll angle in radians.
+     */
     public float getRoll() {
         return (float) Math.atan2(2.0f * (this.w() * this.x() + this.y() * this.z()), 1.0f - 2.0f * (this.x() * this.x() + this.y() * this.y()));
     }
 
+    /**
+     * Inverts the current Quaternion.
+     */
     public void inverse() {
         final float f = this.w() * this.w() + this.x() * this.x() + this.y() * this.y() + this.z() * this.z();
         this.w(this.w() / f);

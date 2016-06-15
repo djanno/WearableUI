@@ -7,13 +7,31 @@ import android.graphics.Point;
 import com.example.federico.wearableui.viewport.Viewport;
 
 /**
- * Created by Federico on 28/04/2016.
+ * @author Federico Giannoni
+ */
+
+/**
+ * This class models a DrawableLine.
  */
 public class DrawableLine extends DrawableContent implements IDrawableLine {
 
+    /**
+     * The line width in pixels.
+     */
     private int deltaX;
+    /**
+     * The line height in pixels.
+     */
     private int deltaY;
 
+    /**
+     * Constructor.
+     * @param from the {@link Point} representing the coordinate of the {@link Viewport} on which the starting point
+     *             of the DrawableLine will be placed.
+     * @param to the Point representing the coordinate of the Viewport on which the end point of the DrawableLine will be placed.
+     * @param viewport the Viewport that will contain the DrawableLine.
+     * @param paint the {@link Paint} that the DrawableLine will use to draw itself.
+     */
     public DrawableLine(final Point from, final Point to, final Viewport viewport, final Paint paint) {
         super(from, viewport, paint);
         this.setEndPoint(to);

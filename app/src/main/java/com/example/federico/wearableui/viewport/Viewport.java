@@ -32,45 +32,95 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Federico on 14/04/2016.
+ * @author Federico Giannoni
  */
 
 /**
- * A Viewport is a custom view that has width and height equivalent or bigger than the screen in which
- * such view is displayed. This view is the only View that a {@link ViewportActivity}
- * can use as its content view. It has the ability to be navigated (or, to be "moved around") through
- * its scroll() method, which takes as argument the orientation of the wearer's gaze.
+ * A Viewport is a custom {@link View} that has width and height equivalent or greater than the screen in which
+ * such View is displayed. This View is the only View that a {@link ViewportActivity}
+ * can use as its ContentView. It has the ability to be navigated (or to be scrolled) through
+ * its scroll() method, which takes as argument the orientation of the wearer's {@link com.example.federico.wearableui.model.gaze.Gaze}.
  * From the framework's point of view, a Viewport is basically a 2D blackboard that can be scrolled by
  * the movement of the user's head.
  * It's also important to know that a Viewport has a redefined coordinate system from a user's perspective:
  * the center of the Viewport is (0, 0), the top left corner is (-width / 2, height / 2), the top right is
- * (width / 2, height / 2), the bottom left is (-width / 2, -height / 2), the bottom right is (width / 2, -height / 2)
+ * (width / 2, height / 2), the bottom left is (-width / 2, -height / 2), the bottom right is (width / 2, -height / 2),
+ * making it the exact same as a Cartesian plane.
  */
 public class Viewport extends View implements IViewport, View.OnTouchListener {
 
+    /**
+     * The range of motion in degrees that is needed to scroll the Viewport vertically entirely.
+     */
     private static final int Y_SCROLLING_ROM = 90;
+
+    /**
+     * The range of motion in degrees that is needed to scroll the Viewport horizontally entirely.
+     */
     private static final int X_SCROLLING_ROM = 120;
 
+    /**
+     * A point holding the dimensions of the screen.
+     */
     protected final Point screen;
 
+    /**
+     * How many pixels wider the Viewport is compared to the device screen.
+     */
     private int extraWidth;
+
+    /**
+     * How many pixels taller the Viewport is compared to the device screen.
+     */
     private int extraHeight;
 
+    /**
+     * Viewport width in pixels.
+     */
     private int width;
+
+    /**
+     * Viewport height in pixels.
+     */
     private int height;
 
+    /**
+     * Cursor of the Viewport.
+     */
     protected final ICursor cursor;
+
+    /**
+     * Children of the Viewport. These are the DrawableContents contained placed inside the Viewport.
+     */
     protected final List<DrawableContent> children;
+
+    /**
+     * Layout parameters.
+     */
     protected final FrameLayout.LayoutParams params;
 
+    /**
+     * Flag indicating whether or not the Viewport can be scrolled.
+     */
     private boolean locked;
 
-    /* remaps a point expressed in the android coordinate system to a point expressed in the viewport coordinate system */
+    /**
+     * Remaps a {@link Point} expressed in the Android coordinate system to a Point expressed in the Viewport coordinate system.
+     * @param androidCoordinate a Point expressed in the Android coordinate system.
+     * @return a Point expressed in the Viewport coordinate system.
+     */
     private Point toViewportCoordinates(final Point androidCoordinate) {
         return(new Point(androidCoordinate.x - this.width / 2, this.height / 2 - androidCoordinate.y));
     }
 
-    /* prepares a pain object with the given parameters */
+    /**
+     * Creates a new {@link Paint} with the specified parameters.
+     * @param color an int representing the color that will be used for the Paint.
+     * @param alpha an alpha value that will be used for the Paint (from 0 to 255).
+     * @param fill true if a fill style should be use for this Paint, false if a stroke style should
+     *             be used for this Paint.
+     * @return a new Paint object with the specified parameters.
+     */
     private Paint preparePaint(final int color, final int alpha, final boolean fill) {
         final Paint paint = new Paint();
         paint.setColor(color);
@@ -79,36 +129,52 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
         return paint;
     }
 
-    /* constructs a viewport with the same dimension of the screen */
+    /**
+     * Constructs a Viewport with the dimensions of the device screen.
+     * @param context the {@link Context}.
+     */
     public Viewport(final Context context) {
         this(context, 0f);
     }
 
-    /* constructs a viewport with the given extra size compared to the screen dimension */
+    /**
+     * Constructs a Viewport with the passed extra dimensions.
+     * @param context the {@link Context}.
+     * @param extraSize the percentage of extra width and extra height relative to the screen dimensions.
+     *                  For example a 0.5 indicates a Viewport that is 50% taller and wider than the device
+     *                  screen.
+     */
     public Viewport(final Context context, final float extraSize) {
         this(context, extraSize, extraSize);
     }
 
-    /* constructs a viewport with the given extra width and height compared to the screen dimension */
+    /**
+     * Constructs a Viewport with the passed extra dimensions.
+     * @param context the {@link Context}.
+     * @param extraWidth the percentage of extra width relative to the screen dimensions. For example a 0.5 indicates a Viewport
+     *                   that is 50% wider than the device screen.
+     * @param extraHeight the percentage of extra height relative to the screen dimensions. For example a 0.5 indicates a Viewport
+     *                    that is 50% taller than the device screen.
+     */
     public Viewport(final Context context, final float extraWidth, final float extraHeight) {
         super(context);
 
-        //by definition, a viewport can only be as big or bigger than the device screen
+        // By definition, a viewport can only be as big or bigger than the device screen
         if(extraWidth < 0 || extraHeight < 0) {
             throw new IllegalArgumentException("A Viewport can only be as big or bigger than the device screen." +
                     "You can not instantiate a Viewport with a negative extraWidth or extraHeight.");
         }
 
-        //first we recover the screen size of the device and store it in a variable
+        // First we recover the screen size of the device and store it in a variable
         this.screen = new Point();
         final WindowManager wm = (WindowManager) this.getContext().getSystemService(Context.WINDOW_SERVICE);
         wm.getDefaultDisplay().getSize(this.screen);
 
-        //the screen size that we recovered though, does not keep the height of the action bar into account.
-        //since a viewport activity for which the viewport is used never has an action bar, we have to calculate
-        //the height of the action bar manually, and add it to the screen size we previously calculated.
-        //keep in mind that this calculus is not 100% accurate, the action bar height is always over-estimated by
-        //a few pixels.
+        // The screen size that we recovered though, does not keep the height of the action bar into account.
+        // since a ViewportActivity for which the Viewport is used never has an action bar, we have to calculate
+        // the height of the action bar manually, and add it to the screen size we previously calculated.
+        // keep in mind that this calculus is not 100% accurate, the action bar height is always over-estimated by
+        // a few pixels.
         TypedValue tv = new TypedValue();
         if (this.getContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
         {
@@ -116,25 +182,25 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
             this.screen.y += actionBarHeight;
         }
 
-        //initialize the cursor of the viewport
+        // Initialize the cursor of the viewport
         this.cursor = new Cursor(this, this.preparePaint(Color.WHITE, 255, true), this.screen);
 
-        //initialize the array that will store all the content of the viewport (a.k.a its children)
+        // Initialize the array that will store all the content of the viewport (a.k.a its children)
         this.children = new ArrayList<>();
 
-        //calculate the extra width and height compared to the device screen in pixels
+        // Calculate the extra width and height compared to the device screen in pixels
         this.extraWidth = (int) (extraWidth * this.screen.x);
         this.extraHeight = (int) (extraHeight * this.screen.y);
 
-        //calculate the height and width of the viewport based on the extra dimensions that were passed as arguments
+        // Calculate the height and width of the viewport based on the extra dimensions that were passed as arguments
         this.width = this.screen.x + this.extraWidth;
         this.height = this.screen.y + this.extraHeight;
 
-        //the viewport is initialized as locked
+        // The viewport is initialized as locked
         this.locked = true;
 
-        //calculate the margin so that the viewport appears centered on the screen upon creation
-        //set the background color as black to get a better see-through effect, then set the on touch listener
+        // Calculate the margin so that the viewport appears centered on the screen upon creation
+        // Set the background color as black to get a better see-through effect, then set the on touch listener
         this.params = new FrameLayout.LayoutParams(this.width, this.height);
         this.params.leftMargin = -(this.extraWidth / 2);
         this.params.topMargin = -(this.extraHeight / 2);
@@ -146,12 +212,12 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
     @Override
     protected void onDraw(final Canvas canvas) {
         super.onDraw(canvas);
-        //every time the viewport is invalidated and redraws itself, it also informs its children to redraw themselves.
-        //the children know how to draw themselves given the canvas of the parent
+        // Every time the Viewport is invalidated and redraws itself, it also informs its children to redraw themselves.
+        // The children know how to draw themselves given the Canvas of the parent
         for(final DrawableContent child : this.children) {
             child.drawOnCanvas(canvas);
         }
-        //the cursor is redrawn as well, since it's a DrawableContent
+        // The Cursor is redrawn as well, since it's a DrawableContent
         this.cursor.drawOnCanvas(canvas);
     }
 
@@ -252,19 +318,16 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
 
     @Override
     public boolean removeContent(final DrawableContent toRemove) {
-        if(this.children.remove(toRemove)) {
-            return true;
-        }
-        return false;
+        return this.children.remove(toRemove);
     }
 
     @Override
     public boolean onTouch(final View v, final MotionEvent event) {
 
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            //whenever a touch event is registered on the viewport, n event dispatcher task is executed
-            //notice how the task works on a copy of the children list to avoid concurrent modification exceptions
-            //this is not the best solution - the best solution would be to synchronize code
+            // Whenever a touch event is registered on the Viewport, an event dispatcher task is executed.
+            // Notice how the task works on a copy of the children list to avoid concurrent modification exceptions.
+            // This is not the best solution - the best solution would be to synchronize code
             final AsyncTask<Void, DrawableContent, Void> eventDispatcher = new AsyncTask<Void, DrawableContent, Void>() {
 
                 private List<DrawableContent> safeCopy = new ArrayList<>();
@@ -277,27 +340,27 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
 
                 @Override
                 protected Void doInBackground(Void... params) {
-                    //the touch event coordinates are stored in a variable, then are remapped to the
-                    //viewport coordinate system. However, if the touch event was dispatched by an
-                    //actual touch event, the coordinate that are passed here are relative to the screen
-                    //of the device and not to the actual view in which the event happened. If that's
-                    //the case we have to remap those coordinates and making them relative to the view,
-                    //by adding the current margins to it. If the touch event was dispatched
-                    //programmatically instead (which means it comes from the Finger Source), there is no
-                    //need to do that as the coordinates are already relative to the view itself.
-                    //Once we have the event coordinates relative to the view, we can remap those
-                    //coordinates to the viewport coordinate system. Once that is done, the thread
-                    //checks if that event happened inside the bounds of a child of the viewport and,
-                    //if that's the case, it informs the child by calling its fireEvent() method.
-                    //notice how the list of children is cycled backwards and how the cycle stops as
-                    //soon as one child whose bounds contain the event is found.
-                    //This means that if there are more children whose bounds overlap and the event is
-                    //fired between those children's bounds, only the one with the greatest Z coordinate
-                    //will be registering the event.
+                    // The touch event coordinates are stored in a variable, then are remapped to the
+                    // Viewport coordinate system. However, if the touch event was dispatched by an
+                    // actual touch event, the coordinate that are passed here are relative to the screen
+                    // of the device and not to the actual View in which the event happened. If that's
+                    // the case we have to remap those coordinates and making them relative to the View,
+                    // by adding the current margins to it. If the touch event was dispatched
+                    // programmatically instead (which means it comes from the Cursor), there is no
+                    // need to do that as the coordinates are already relative to the View itself.
+                    // Once we have the event coordinates relative to the View, we can remap those
+                    // coordinates to the Viewport coordinate system. Once that is done, the thread
+                    // checks if that event happened inside the bounds of a child of the Viewport and,
+                    // if that's the case, it informs the child by calling its fireEvent() method.
+                    // Notice how the list of children is cycled backwards and how the cycle stops as
+                    // soon as one child whose bounds contain the event is found.
+                    // This means that if there are more children whose bounds overlap and the event is
+                    // fired between those children's bounds, only the one with the greatest Z coordinate
+                    // will be registering the event.
                     for(int i = this.safeCopy.size() - 1; i >= 0; i--) {
                         final Point point = new Point((int) event.getX(), (int) event.getY());
-                        //the click made by the Finger Source, is taken as a shift+click and doesn't need
-                        //the following mapping
+                        // The click made by the Cursor, is taken as a shift+click and doesn't need
+                        // the following mapping
                         if(event.getMetaState() != KeyEvent.META_SHIFT_ON) {
                             point.x -= Viewport.this.params.leftMargin;
                             point.y -= Viewport.this.params.topMargin;
@@ -312,12 +375,12 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
                     return null;
                 }
 
-                //if a child whose bounds contain the event is found and that child had an active listener
-                //to handle the event, the viewport is invalidated and, therefore, so are all of its children
+                // If a child whose bounds contain the event is found and that child had an active listener
+                // to handle the event, the Viewport is invalidated and, therefore, so are all of its children
                 @Override
                 protected void onProgressUpdate(DrawableContent... values) {
                     super.onProgressUpdate(values);
-                    //the event is fired on the main thread just in case it has to update the view
+                    // The event is fired on the main thread just in case it has to update the view
                     if(values[0].fireEvent()) {
                         Viewport.this.invalidate();
                     }
@@ -333,22 +396,22 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
 
     @Override
     public void scrollAccordingly(final float pitch, final float yaw) {
-        //if the viewport isn't locked, begin scrolling procedure
+        // If the viewport isn't locked, begin scrolling procedure
         if(!this.locked) {
             final int oldTopMargin = this.params.topMargin;
             final int oldLeftMargin = this.params.leftMargin;
-            //compute the new margins that will be used to scroll the viewport from the values of pitch and yaw passed to the method.
-            //keep in mind that these values represent the pitch and yaw from our zero point, which we obtained during the calibration phase
-            //i.e. a pitch of 30 deg means 30 deg above the zero point, a yaw of 30 deg means 30 deg to the left of our zero point
+            // Compute the new margins that will be used to scroll the viewport from the values of pitch and yaw passed to the method.
+            // Keep in mind that these values represent the pitch and yaw from our zero point, which we obtained during the calibration phase
+            // i.e. a pitch of 30 deg means 30 deg above the zero point, a yaw of 30 deg means 30 deg to the left of our zero point
 
-            //-extraHeight / 2 and -extraWidth / 2 are the margin values that we need to have our field of view in the center of the viewport
-            //to these we sum the current pitch multiplied by a coefficient to obtain the number of pixels for each degree
-            //the coefficient was obtained from -> pitch : Y_SCROLLING_ROM / 2 = deltaTopMargin : extraHeight / 2
+            // -extraHeight / 2 and -extraWidth / 2 are the margin values that we need to have our field of view in the center of the viewport
+            // to these we sum the current pitch multiplied by a coefficient to obtain the number of pixels for each degree
+            // the coefficient was obtained from -> pitch : Y_SCROLLING_ROM / 2 = deltaTopMargin : extraHeight / 2
             this.params.topMargin = (int) ((-this.extraHeight / 2) + (pitch * this.extraHeight / Y_SCROLLING_ROM));
             this.params.leftMargin = (int) ((-this.extraWidth / 2) + (yaw * this.extraWidth / X_SCROLLING_ROM));
-            //scroll the viewport by setting the margins
+            // Scroll the viewport by setting the margins
             this.setLayoutParams(this.params);
-            //scroll the cursor accordingly, so that it's always inside the field of view
+            // Scroll the Cursor accordingly, so that it's always inside the field of view
             final Point cursorCoordinates = this.cursor.getViewportCoordinates();
             cursorCoordinates.x -= (this.params.leftMargin - oldLeftMargin);
             cursorCoordinates.y += (this.params.topMargin - oldTopMargin);
@@ -373,12 +436,25 @@ public class Viewport extends View implements IViewport, View.OnTouchListener {
      */
     public class FieldOfView {
 
+        /**
+         * A rectangle representing the field of view.
+         */
         private final Rect fov;
 
+        /**
+         * Constructor.
+         * @param topLeft the {@link Point} representing the coordinate of the {@link Viewport} that coincides
+         *                with the top left point of the field of view.
+         */
         public FieldOfView(final Point topLeft) {
             this.fov = new Rect(topLeft.x, topLeft.y, topLeft.x + screen.x, topLeft.y - screen.y);
         }
 
+        /**
+         * Returns the center of the field of view.
+         * @return a {@link Point} representing the coordinate of the {@link Viewport} that coincides with the
+         * center of the field of view.
+         */
         public Point getCenter() {
             return new Point(this.fov.left + screen.x / 2, this.fov.top - screen.y / 2);
         }
